@@ -11,6 +11,7 @@ const init = async () => {
   // Create Canvas Element
   canvas = document.createElement("canvas");
   ctx = canvas.getContext("2d");
+  ctx.imageSmoothingEnabled = false;
 
   // Set Canvas Size
   canvas.width = 16;
@@ -25,10 +26,10 @@ const init = async () => {
 
   // Load Images
   [favicon, logo, win, numbers] = await Promise.all([
-    loadImage('assets/favicon.png'),
+    loadImage('assets/favicon.svg'),
     loadImage('assets/logo.png'),
     loadImage('assets/win.png'),
-    loadImage('assets/numbers.png')
+    loadImage('assets/numbers3.png')
   ]);
 
   faviconLink = document.querySelector('link[rel="shortcut icon"]');
@@ -45,7 +46,7 @@ const init = async () => {
   };
 
   apple = {
-    fill: 'red',
+    fill: '#ee1717',
     pos: [0, 0]
   };
 
@@ -257,13 +258,21 @@ function drawCell(x, y, fill) {
   ctx.fillRect(x, y, 1, 1);
 }
 
-function drawNumber(num, x, y) {
+function drawNumber(num, x, w = 6) {
+  let sourceW = 6;
+  let sourceX = num * sourceW;
+  console.log(num, x, w);
+  
+  if ((num == 1 || num == 2) && w <= 4) {
+    sourceX = num == 1 ? 60 : 64;
+    sourceW = 4;
+  }
   ctx.drawImage(
     numbers,
-    num * 6, 0, // Source X, Y
-    6, 14, // Source Width, Height
-    x, y, // Destination X, Y
-    6, 14 // Destination Width, Height
+    sourceX, 0, // Source X, Y
+    sourceW, 14, // Source Width, Height
+    x, 1, // Destination X, Y
+    w, 14 // Destination Width, Height
   );
 }
 
@@ -272,16 +281,19 @@ function drawCanvas() {
   // Clear Canvas
   ctx.fillStyle = 'black';
   ctx.fillRect(0, 0, canvas.width, canvas.height);
-
   if (game.state === 'end' || game.state === 'pause') {
-    if (snake.length > 99) { snake.length = 99; }
+    snake.length = 132;
     if (snake.length < 10) {
-      drawNumber(snake.length, 5, 1);
+      drawNumber(snake.length, 5);
+    } else if (snake.length >= 100) {
+      drawNumber(Math.floor(snake.length / 100), 0, 4);
+      drawNumber(Math.floor((snake.length % 100) / 10), 5, 5);
+      drawNumber(snake.length % 10, 11, 5);
     } else {
-      drawNumber(Math.floor(snake.length / 10), 1, 1);
-      drawNumber(snake.length % 10, 9, 1);
+      drawNumber(Math.floor(snake.length / 10), 1);
+      drawNumber(snake.length % 10, 9);
     }
-    updateFavicon();
+    updateFavicon(true);
     return;
   } else if (game.state === 'win') {
     ctx.drawImage(
@@ -317,7 +329,7 @@ function drawCanvas() {
 
 }
 
-function updateFavicon() {
+function updateFavicon(onlyWB = false) {
 
   // Update Document Title with Score
   let title = 'Favicon Snake - ';
@@ -335,6 +347,26 @@ function updateFavicon() {
   }
 
   document.title = title;
+
+  // If onlyWB is true, convert canvas to black and white pixels (no gray)
+  if (onlyWB) {
+    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    const data = imageData.data;
+
+    for (let i = 0; i < data.length; i += 4) {
+      const brightness = (data[i] + data[i + 1] + data[i + 2]) / 3;
+
+      // const color = brightness > 96 ? 255 : brightness > 48 ? brightness : 0;
+      const color = brightness > 96 ? 255 : 0;
+
+      data[i] = color;
+      data[i + 1] = color;
+      data[i + 2] = color;
+    }
+
+    ctx.putImageData(imageData, 0, 0);
+
+  }
 
   // Create DataURL
   dataURL = canvas.toDataURL("image/png");
