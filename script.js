@@ -41,7 +41,7 @@ const init = async () => {
     directionQueue: [],
     length: 0,
     head: [0, 0],
-    tail: [[], []]
+    tail: [[]]
   };
 
   apple = {
@@ -93,8 +93,6 @@ const setupInputs = () => {
     // Restart Game via Space Key
     if (e.code === 'Space' && (game.state == 'end' || game.state == 'win')) {
       startGame();
-      game.state = 'playing';
-      game.previousState = 'playing';
     }
 
   });
@@ -131,7 +129,7 @@ function startGame() {
     randNum(0, canvas.width / 2), 
     randNum(canvas.height / 2, canvas.height - 2)
   ];
-  snake.tail = [[], []];
+  snake.tail = [[]];
 
   apple.pos = [
     randNum(2, canvas.width - 2), 
@@ -157,14 +155,17 @@ function moveApple() {
       randNum(0, canvas.width - 1), 
       randNum(0, canvas.height - 1)
     ];
-  } while (isCellInSnake(newPos[0], newPos[1]));
+  } while (isCellInSnake(newPos));
 
   apple.pos = newPos;
 
-  function isCellInSnake(x, y) {
+  function isCellInSnake(newPos) {
     // Check if the cell is part of the snake's body
     for (let i = 0; i < snake.length; i++) {
-      if (snake.tail[0][i] === x && snake.tail[1][i] === y) {
+      if (
+        snake.tail[i][0] === newPos[0] &&
+        snake.tail[i][1] === newPos[1]
+      ) {
         return true;
       }
     }
@@ -230,16 +231,17 @@ let gameLoop = () => {
 
     // Create Tail
     // Add Snake X/Y to start of x/y array
-    snake.tail[0].unshift(snake.head[0]);
-    snake.tail[1].unshift(snake.head[1]);
+    snake.tail.unshift([snake.head[0], snake.head[1]]);
 
     // Set Array to only be the length of the Snake
-    snake.tail[0].length = snake.length + 1;
-    snake.tail[1].length = snake.length + 1;
+    snake.tail.length = snake.length + 1;
 
     // Check for tail collision
     for (let i = 1; i < snake.length + 1; i++) {
-      if (snake.head[0] == snake.tail[0][i] && snake.head[1] == snake.tail[1][i]) {
+      if (
+        snake.head[0] == snake.tail[i][0]&& 
+        snake.head[1] == snake.tail[i][1]
+      ) {
         game.state = 'end';
       }
     }
@@ -308,7 +310,7 @@ function drawCanvas() {
 
   // Draw Snake
   for (let i = 0; i < snake.length + 1; i++) {
-    drawCell(snake.tail[0][i], snake.tail[1][i], snake.fill);
+    drawCell(snake.tail[i][0], snake.tail[i][1], snake.fill);
   }
 
   updateFavicon();
