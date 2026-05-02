@@ -29,7 +29,7 @@ const init = async () => {
     loadImage('assets/favicon.svg'),
     loadImage('assets/logo.png'),
     loadImage('assets/win.png'),
-    loadImage('assets/numbers3.png')
+    loadImage('assets/numbers.png')
   ]);
 
   faviconLink = document.querySelector('link[rel="shortcut icon"]');
@@ -178,10 +178,10 @@ function moveApple() {
 let gameLoop = () => {
 
   if (
-    (!document.hasFocus() || document.hidden) 
-    && game.state != 'pause' 
-    && game.state != 'end' 
-    && game.state != 'win'
+    (!document.hasFocus() || document.hidden) && 
+  	game.state != 'pause' &&
+  	game.state != 'end' &&
+    game.state != 'win'
   ) {
     if (game.state != 'outOfFocus') game.previousState = game.state;
     game.state = 'outOfFocus';
@@ -251,7 +251,7 @@ let gameLoop = () => {
 
   drawCanvas();
 
-}
+};
 
 function drawCell(x, y, fill) {
   ctx.fillStyle = fill;
@@ -282,7 +282,6 @@ function drawCanvas() {
   ctx.fillStyle = 'black';
   ctx.fillRect(0, 0, canvas.width, canvas.height);
   if (game.state === 'end' || game.state === 'pause') {
-    snake.length = 132;
     if (snake.length < 10) {
       drawNumber(snake.length, 5);
     } else if (snake.length >= 100) {
