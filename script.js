@@ -58,7 +58,7 @@ const init = async () => {
 
 const setupInputs = () => {
 
-  // Keyboard Control Listers
+  // Keyboard Control Listeners
   document.addEventListener('keydown', (e) => {
 
     if (game.state === 'playing' || game.state === 'start') {
@@ -142,36 +142,31 @@ function startGame() {
 }
 
 function moveApple() {
-  // Check if Game Over
-  if (snake.length >= (canvas.width * canvas.height) - 1) {
+  let freeCells = [];
+
+  const OccupiedCells = new Set(
+    snake.tail.map(([x, y]) => `${x},${y}`)
+  );
+
+  // Build list of free cells
+  for (let x = 0; x < canvas.width; x++) {
+    for (let y = 0; y < canvas.height; y++) {
+      const key = `${x},${y}`;
+      if (!OccupiedCells.has(key)) {
+        freeCells.push([x, y]);
+      }
+    }
+  }
+
+  // Check if Win (no free space left)
+  if (freeCells.length === 0) {
     game.state = 'win';
     return;
   }
 
-  // Move Apple to New Random Position where snake isn't
-  let newPos = [];
-
-  do {
-    newPos = [
-      randNum(0, canvas.width - 1), 
-      randNum(0, canvas.height - 1)
-    ];
-  } while (isCellInSnake(newPos));
-
-  apple.pos = newPos;
-
-  function isCellInSnake(newPos) {
-    // Check if the cell is part of the snake's body
-    for (let i = 0; i < snake.length; i++) {
-      if (
-        snake.tail[i][0] === newPos[0] &&
-        snake.tail[i][1] === newPos[1]
-      ) {
-        return true;
-      }
-    }
-    return false;
-  }
+  // Pick a random free cell
+  const newPos = Math.floor(Math.random() * freeCells.length);
+  apple.pos = freeCells[newPos];
 
 }
 
@@ -261,7 +256,6 @@ function drawCell(x, y, fill) {
 function drawNumber(num, x, w = 6) {
   let sourceW = 6;
   let sourceX = num * sourceW;
-  console.log(num, x, w);
   
   if ((num == 1 || num == 2) && w <= 4) {
     sourceX = num == 1 ? 60 : 64;
