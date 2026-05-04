@@ -144,9 +144,14 @@ function startGame() {
 function moveApple() {
   let freeCells = [];
 
+  // Create Set of Occupied Cells
   const OccupiedCells = new Set(
     snake.tail.map(([x, y]) => `${x},${y}`)
   );
+
+  // Add head to occupied cells
+  const headKey = `${snake.head[0]},${snake.head[1]}`;
+  OccupiedCells.add(headKey);
 
   // Build list of free cells
   for (let x = 0; x < canvas.width; x++) {
@@ -233,7 +238,7 @@ let gameLoop = () => {
     snake.tail.length = snake.length + 1;
 
     // Check for tail collision
-    for (let i = 1; i < snake.length + 1; i++) {
+    for (let i = 1; i < snake.tail.length; i++) {
       if (
         snake.head[0] == snake.tail[i][0]&& 
         snake.head[1] == snake.tail[i][1]
