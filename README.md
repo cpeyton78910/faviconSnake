@@ -4,7 +4,7 @@ Experience the classic game known as Snake as a Favicon!
 
 ## Where to Play
 
-[GitHub Pages](https://cpeyton78910.github.io/faviconSnake)
+[GitHub Pages](https://violet78910.github.io/faviconSnake)
 
 ## How to Play
 
