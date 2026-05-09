@@ -39,13 +39,11 @@ const init = async () => {
       // Set Restore Values
       if (game.attributes.state !== 'outOfFocus') {
         game.attributes.preNoFocusState = game.attributes.state;
+        if (game.states.end.includes(newState)) updateHighScore();
       }
       if (game.states.active.includes(game.attributes.state)) {
         game.attributes.prePauseState = game.attributes.state;
       }
-
-      if (game.states.end.includes(newState))
-        updateHighScore();
 
       if (game.states.inactive.includes(newState)) {
         game.attributes.static = true;
